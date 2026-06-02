@@ -1,36 +1,45 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# SpaceX Explorer
 
-## Getting Started
+A frontend explorer for SpaceX launch data, built with Next.js, React, and TypeScript.
 
-First, run the development server:
+## Status
+
+In progress. See the decisions log below.
+
+## Getting started
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture decisions
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **App Router** — current Next.js default; enables Server Components for data fetching on detail pages later.
+- **CSS Modules** — styling is deferred to a dedicated pass; CSS Modules ship with Next.js and need no extra config.
 
-## Learn More
+## Roadmap
 
-To learn more about Next.js, take a look at the following resources:
+- [ ] Fetch and display launches from the SpaceX API
+- [ ] Server-side pagination, filtering, sorting, search
+- [ ] Launch detail page
+- [ ] Favorites (LocalStorage)
+- [ ] Styling pass
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## SpaceX API usage
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Launches come from `POST /v4/launches/query`, not `GET /v4/launches`. The
+query endpoint does filtering, sorting, and pagination server-side; the plain
+GET would return all launches
 
-## Deploy on Vercel
+The request body has two parts: `query` (filter conditions, empty = match all)
+and `options` (pagination, sort, field selection). Responses come wrapped in a
+pagination envelope - results are in `docs`, and `hasNextPage` / `nextPage`
+will drive the "Load more" control.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Current state
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The home page fetches the 10 most recent launches in a Server Component and
+renders their names. No loading/error UI yet.

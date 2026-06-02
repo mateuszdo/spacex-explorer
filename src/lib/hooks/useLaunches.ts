@@ -1,10 +1,11 @@
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { fetchLaunches } from "@/lib/launches";
+import type { LaunchFilters } from "@/types/launch";
 
-export function useLaunches(search: string) {
+export function useLaunches(filters: LaunchFilters) {
   return useInfiniteQuery({
-    queryKey: ["launches", { search }],
-    queryFn: ({ pageParam }) => fetchLaunches(pageParam, search),
+    queryKey: ["launches", filters],
+    queryFn: ({ pageParam }) => fetchLaunches(pageParam, filters),
     initialPageParam: 1,
     getNextPageParam: (lastPage) => lastPage.nextPage ?? undefined,
   });

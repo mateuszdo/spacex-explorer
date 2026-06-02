@@ -8,9 +8,10 @@ In progress. See the decisions log below.
 
 ### Current state
 
-Home page renders launches with mission-name search and infinite "Load more"
-pagination, plus loading, error/retry, and empty states. Search and pagination
-are server-side. No additional filters, sorting, or styling yet.
+Home page renders launches with full filtering — mission search, upcoming/past,
+success/failure, date range, and sort (date or name, asc/desc) — plus infinite
+"Load more" pagination and loading, error/retry, and empty states. All filtering
+and sorting is server-side. No styling yet.
 
 ## Getting started
 
@@ -31,9 +32,9 @@ Open http://localhost:3000.
 - [x] Fetch and display launches from the SpaceX API
 - [x] Server-side pagination
 - [x] Mission-name search
-- [ ] Filtering, sorting
+- [x] Filtering, sorting
 - [ ] Launch detail page
-- [ ] Favorites (LocalStorage),
+- [ ] Favorites (LocalStorage)
 - [ ] Styling pass
 
 ## SpaceX API usage
@@ -58,9 +59,9 @@ Structure:
 - `lib/hooks/useLaunches.ts` — the React Query hook (how the UI consumes it).
 - `app/providers.tsx` — client-side QueryClient provider, wired into the layout.
 
-The `queryKey` (`["launches", { search }]`) is the cache identity. Each search
-term caches independently; additional filters and sort options will be added to
-the key the same way.
+The `queryKey` (`["launches", filters]`) is the cache identity — the entire
+`LaunchFilters` object. Each filter/sort combination caches independently, and
+any change refetches from page 1.
 
 ### Tradeoff
 
@@ -79,9 +80,20 @@ more page of 12 via `options.page`.
 
 ### Search and filtering
 
-Mission search uses MongoDB `$regex` (case-insensitive) in the request `query`.
-The SpaceX `/query` endpoints pass the `query` object through to MongoDB, so any
-standard MongoDB operator works — matching happens server-side, not by filtering
-fetched results. The search term is part of the `queryKey`, so each term caches
-independently and changing it refetches from page 1 automatically. The input is
-debounced (400ms) to avoid a request per keystroke.
+All filtering and sorting runs server-side via the request `query` and
+`options`, never by filtering fetched results.
+
+- **Search** — MongoDB `$regex`, case-insensitive, on `name`. The `/query`
+  endpoints pass `query` through to MongoDB, so standard operators work.
+- **Timeframe** — filters on the stored `upcoming` boolean (not a date
+  comparison; the flag and `date_utc` can disagree on older records).
+- **Outcome** — filters on `success`. It is `boolean | null` (null = upcoming),
+  so `success: false` matches genuine failures only.
+- **Date range** — `$gte` / `$lte` on `date_utc`; the end date is pushed to
+  end-of-day so it is inclusive.
+- **Sort** — `options.sort` on `date_utc` or `name`, asc or desc.
+
+All filter state lives in one `LaunchFilters` object that is the `queryKey`, so
+each combination caches independently and any change refetches from page 1.
+Only the search input is debounced (400ms); dropdowns and date pickers apply
+immediately.

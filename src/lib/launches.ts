@@ -1,4 +1,9 @@
-import type { Launch, LaunchFilters, PaginatedResponse } from "@/types/launch";
+import type {
+  Launch,
+  LaunchFilters,
+  LaunchDetail,
+  PaginatedResponse,
+} from "@/types/launch";
 
 const PAGE_SIZE = 12;
 
@@ -63,4 +68,37 @@ export async function fetchLaunches(
   }
 
   return res.json() as Promise<PaginatedResponse<Launch>>;
+}
+
+export async function fetchLaunchById(
+  id: string,
+): Promise<LaunchDetail | null> {
+  const res = await fetch("https://api.spacexdata.com/v4/launches/query", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      query: { _id: id },
+      options: {
+        limit: 1,
+        pagination: false,
+        populate: [
+          {
+            path: "rocket",
+            select: ["name", "type", "description", "flickr_images"],
+          },
+          {
+            path: "launchpad",
+            select: ["name", "full_name", "locality", "region", "status"],
+          },
+        ],
+      },
+    }),
+  });
+
+  if (!res.ok) {
+    throw new Error(`SpaceX API error: ${res.status}`);
+  }
+
+  const data: PaginatedResponse<LaunchDetail> = await res.json();
+  return data.docs[0] ?? null;
 }

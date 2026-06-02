@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { useLaunches } from "@/lib/hooks/useLaunches";
 import { useDebounce } from "@/lib/hooks/useDebounce";
@@ -125,7 +126,9 @@ export default function HomePage() {
       {launches.length > 0 && (
         <ul>
           {launches.map((launch) => (
-            <li key={launch.id}>{launch.name}</li>
+            <li key={launch.id}>
+              <Link href={`/launches/${launch.id}`}>{launch.name}</Link>
+            </li>
           ))}
         </ul>
       )}

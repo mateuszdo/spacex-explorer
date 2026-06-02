@@ -42,3 +42,42 @@ export const DEFAULT_FILTERS: LaunchFilters = {
   sortField: "date_utc",
   sortDirection: "desc",
 };
+
+export interface Rocket {
+  id: string;
+  name: string;
+  type: string;
+  description: string;
+  flickr_images: string[];
+}
+
+export interface Launchpad {
+  id: string;
+  name: string;
+  full_name: string;
+  locality: string;
+  region: string;
+  status: string;
+}
+
+export interface LaunchLinks {
+  patch: { small: string | null; large: string | null };
+  webcast: string | null;
+  article: string | null;
+  wikipedia: string | null;
+  flickr: { small: string[]; original: string[] };
+}
+
+/** A launch with rocket + launchpad resolved (detail view). */
+export interface LaunchDetail {
+  id: string;
+  name: string;
+  date_utc: string;
+  date_precision: Launch["date_precision"];
+  upcoming: boolean;
+  success: boolean | null;
+  details: string | null;
+  links: LaunchLinks;
+  rocket: Rocket | null;
+  launchpad: Launchpad | null;
+}

@@ -8,10 +8,10 @@ In progress. See the decisions log below.
 
 ### Current state
 
-Home page renders launches with full filtering — mission search, upcoming/past,
-success/failure, date range, and sort (date or name, asc/desc) — plus infinite
-"Load more" pagination and loading, error/retry, and empty states. All filtering
-and sorting is server-side. No styling yet.
+Launches list with full filtering, search, sort, and "Load more" pagination,
+plus a server-rendered detail page at `/launches/[id]` showing launch info,
+rocket, launchpad, links, and a photo gallery (when images exist). Loading,
+error/retry, empty, and not-found states are handled. No styling yet.
 
 ## Getting started
 
@@ -33,7 +33,7 @@ Open http://localhost:3000.
 - [x] Server-side pagination
 - [x] Mission-name search
 - [x] Filtering, sorting
-- [ ] Launch detail page
+- [x] Launch detail page
 - [ ] Favorites (LocalStorage)
 - [ ] Styling pass
 
@@ -97,3 +97,19 @@ All filter state lives in one `LaunchFilters` object that is the `queryKey`, so
 each combination caches independently and any change refetches from page 1.
 Only the search input is debounced (400ms); dropdowns and date pickers apply
 immediately.
+
+### Launch detail
+
+Route `/launches/[id]`, rendered as a Server Component — it is non-interactive,
+so server rendering gives a faster first paint and real SSR (the tradeoff noted
+above). It fetches via `/launches/query` with `_id` match and `populate`, which
+resolves `rocket` and `launchpad` in a single request rather than three separate
+calls. `select` trims the populated documents. `notFound()` handles a bad id.
+
+`rocket` and `launchpad` can be `null` (some launches have no linked record), so
+the UI guards for absence. Low-precision dates are flagged approximate rather
+than shown as exact timestamps. than shown as exact timestamps.
+
+The gallery only renders when a launch has Flickr images, which most launches
+do not; the section is omitted otherwise. It uses plain `<img>` — switching to
+`next/image` (with `remotePatterns` for the Flickr domains) is a TODO.

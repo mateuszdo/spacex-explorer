@@ -8,9 +8,9 @@ In progress. See the decisions log below.
 
 ### Current state
 
-Home page renders launches with infinite "Load more" pagination, plus loading
-and error/retry states. Fetching is server-side paginated (12 per page). No
-filtering, sorting, search, or styling yet.
+Home page renders launches with mission-name search and infinite "Load more"
+pagination, plus loading, error/retry, and empty states. Search and pagination
+are server-side. No additional filters, sorting, or styling yet.
 
 ## Getting started
 
@@ -29,22 +29,23 @@ Open http://localhost:3000.
 ## Roadmap
 
 - [x] Fetch and display launches from the SpaceX API
-- [x] Server-side pagination,
-- [ ] Filtering, sorting, search
+- [x] Server-side pagination
+- [x] Mission-name search
+- [ ] Filtering, sorting
 - [ ] Launch detail page
-- [ ] Favorites (LocalStorage)
+- [ ] Favorites (LocalStorage),
 - [ ] Styling pass
 
 ## SpaceX API usage
 
 Launches come from `POST /v4/launches/query`, not `GET /v4/launches`. The
 query endpoint does filtering, sorting, and pagination server-side; the plain
-GET returns every launch that is not recommended.
+GET would return all of the launches at once.
 
 The request body has two parts: `query` (filter conditions, empty = match all)
 and `options` (pagination, sort, field selection). Responses come wrapped in a
 pagination envelope - results are in `docs`, and `hasNextPage` / `nextPage`
-will drive the "Load more" control.
+drives the "Load more" control.
 
 ## Data layer: React Query
 
@@ -57,8 +58,9 @@ Structure:
 - `lib/hooks/useLaunches.ts` — the React Query hook (how the UI consumes it).
 - `app/providers.tsx` — client-side QueryClient provider, wired into the layout.
 
-The `queryKey` (`["launches"]`) is the cache identity. Filters and
-sort options will be added to it so each combination caches independently.
+The `queryKey` (`["launches", { search }]`) is the cache identity. Each search
+term caches independently; additional filters and sort options will be added to
+the key the same way.
 
 ### Tradeoff
 
@@ -74,3 +76,12 @@ response envelope and returns it as the next page number, or `undefined` on the
 last page (when the API sends `nextPage: null`) — which automatically hides the
 "Load more" button. Pagination is fully server-side: each click requests one
 more page of 12 via `options.page`.
+
+### Search and filtering
+
+Mission search uses MongoDB `$regex` (case-insensitive) in the request `query`.
+The SpaceX `/query` endpoints pass the `query` object through to MongoDB, so any
+standard MongoDB operator works — matching happens server-side, not by filtering
+fetched results. The search term is part of the `queryKey`, so each term caches
+independently and changing it refetches from page 1 automatically. The input is
+debounced (400ms) to avoid a request per keystroke.

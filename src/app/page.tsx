@@ -3,7 +3,17 @@
 import { useLaunches } from "@/lib/hooks/useLaunches";
 
 export default function HomePage() {
-  const { data, isPending, isError, refetch } = useLaunches();
+  const {
+    data,
+    isPending,
+    isError,
+    refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useLaunches();
+
+  const launches = data?.pages.flatMap((page) => page.docs) ?? [];
 
   return (
     <main>
@@ -18,12 +28,18 @@ export default function HomePage() {
         </div>
       )}
 
-      {data && (
+      {launches.length > 0 && (
         <ul>
-          {data.map((launch) => (
+          {launches.map((launch) => (
             <li key={launch.id}>{launch.name}</li>
           ))}
         </ul>
+      )}
+
+      {hasNextPage && (
+        <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+          {isFetchingNextPage ? "Loading…" : "Load more"}
+        </button>
       )}
     </main>
   );

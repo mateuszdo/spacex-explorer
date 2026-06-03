@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useLaunches } from "@/lib/hooks/useLaunches";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { DEFAULT_FILTERS, type LaunchFilters } from "@/types/launch";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 export default function HomePage() {
   const [filters, setFilters] = useState<LaunchFilters>(DEFAULT_FILTERS);
@@ -35,6 +36,10 @@ export default function HomePage() {
   return (
     <main>
       <h1>SpaceX Explorer</h1>
+
+      <p>
+        <Link href="/favorites">View favorites →</Link>
+      </p>
 
       <div>
         <label htmlFor="search">Search missions</label>
@@ -128,6 +133,7 @@ export default function HomePage() {
           {launches.map((launch) => (
             <li key={launch.id}>
               <Link href={`/launches/${launch.id}`}>{launch.name}</Link>
+              <FavoriteButton launch={{ id: launch.id, name: launch.name }} />
             </li>
           ))}
         </ul>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchLaunchById } from "@/lib/launches";
+import { FavoriteButton } from "@/components/FavoriteButton";
 
 export default async function LaunchDetailPage({
   params,
@@ -23,6 +24,7 @@ export default async function LaunchDetailPage({
       </p>
 
       <h1>{launch.name}</h1>
+      <FavoriteButton launch={{ id: launch.id, name: launch.name }} />
 
       <p>
         {new Date(launch.date_utc).toUTCString()}

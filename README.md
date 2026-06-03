@@ -8,10 +8,10 @@ In progress. See the decisions log below.
 
 ### Current state
 
-Launches list with full filtering, search, sort, and "Load more" pagination,
-plus a server-rendered detail page at `/launches/[id]` showing launch info,
-rocket, launchpad, links, and a photo gallery (when images exist). Loading,
-error/retry, empty, and not-found states are handled. No styling yet.
+Launches list with filtering, search, sort, and "Load more" pagination; a
+server-rendered detail page at `/launches/[id]`; and favorites (bookmark from
+the list or detail, view/remove on `/favorites`) persisted in LocalStorage. All
+loading, error/retry, empty, and not-found states are handled. No styling yet.
 
 ## Getting started
 
@@ -34,7 +34,7 @@ Open http://localhost:3000.
 - [x] Mission-name search
 - [x] Filtering, sorting
 - [x] Launch detail page
-- [ ] Favorites (LocalStorage)
+- [x] Favorites (LocalStorage)
 - [ ] Styling pass
 
 ## SpaceX API usage
@@ -108,8 +108,20 @@ calls. `select` trims the populated documents. `notFound()` handles a bad id.
 
 `rocket` and `launchpad` can be `null` (some launches have no linked record), so
 the UI guards for absence. Low-precision dates are flagged approximate rather
-than shown as exact timestamps. than shown as exact timestamps.
+than shown as exact timestamps.
 
 The gallery only renders when a launch has Flickr images, which most launches
 do not; the section is omitted otherwise. It uses plain `<img>` — switching to
 `next/image` (with `remotePatterns` for the Flickr domains) is a TODO.
+
+### Favorites
+
+Bookmarks persist in LocalStorage under `spacex:favorites`, storing each
+launch's id and name so the favorites page renders without re-fetching.
+
+LocalStorage is client-only, so reading it during render would cause a
+server/client hydration mismatch. The `useFavorites` hook avoids this: state
+starts empty (matching the server), and a post-mount `useEffect` reads storage
+and flips a `hydrated` flag. Components gate stored-state UI on `hydrated`, so
+the first paint always agrees with the server. A `storage` event listener keeps
+favorites in sync across open tabs.

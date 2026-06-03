@@ -1,0 +1,34 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #fff;
+  border-bottom: 1px solid #e2e5ea;
+}
+
+.logo {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.nav {
+  display: flex;
+  gap: 1.25rem;
+}
+
+.active {
+  color: #6b7280;
+  font-weight: 600;
+  cursor: default;
+}
+.link {
+  color: #6b7280;
+  font-weight: 600;
+  text-decoration: underline;
+}
+
+.link:hover {
+  color: #1a1a1a;
+}

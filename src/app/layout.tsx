@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Providers } from "./providers";
+import { SiteNav } from "@/components/SiteNav";
+import styles from "./layout.module.css";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -15,7 +17,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning>
-        <Providers>{children}</Providers>
+        <Providers>
+          <SiteNav />
+          <main className={styles.main}>{children}</main>
+        </Providers>
       </body>
     </html>
   );

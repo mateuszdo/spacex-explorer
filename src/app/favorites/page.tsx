@@ -2,32 +2,36 @@
 
 import Link from "next/link";
 import { useFavorites } from "@/lib/hooks/useFavorites";
+import styles from "./page.module.css";
 
 export default function FavoritesPage() {
   const { favorites, toggle, hydrated } = useFavorites();
 
   return (
-    <main>
-      <p>
-        <Link href="/">← Back to launches</Link>
-      </p>
+    <>
+      <Link href="/" className={styles.back}>
+        ← Back to launches
+      </Link>
 
       <h1>Favorites</h1>
 
-      {!hydrated && <p>Loading…</p>}
+      {!hydrated && <p className={styles.empty}>Loading…</p>}
 
       {hydrated && favorites.length === 0 && (
-        <p>No favorites yet. Bookmark a launch to see it here.</p>
+        <p className={styles.empty}>
+          No favorites yet. Bookmark a launch to see it here.
+        </p>
       )}
 
       {hydrated && favorites.length > 0 && (
-        <ul>
+        <ul className={styles.list}>
           {favorites.map((fav) => (
-            <li key={fav.id}>
+            <li key={fav.id} className={styles.item}>
               <Link href={`/launches/${fav.id}`}>{fav.name}</Link>
               <button
                 onClick={() => toggle(fav)}
                 aria-label={`Remove ${fav.name} from favorites`}
+                className={styles.button}
               >
                 Remove
               </button>
@@ -35,6 +39,6 @@ export default function FavoritesPage() {
           ))}
         </ul>
       )}
-    </main>
+    </>
   );
 }

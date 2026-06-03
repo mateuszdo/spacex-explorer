@@ -1,16 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useLaunches } from "@/lib/hooks/useLaunches";
 import { useDebounce } from "@/lib/hooks/useDebounce";
 import { DEFAULT_FILTERS, type LaunchFilters } from "@/types/launch";
-import { FavoriteButton } from "@/components/FavoriteButton";
+import { LaunchCard } from "@/components/LaunchCard";
+import styles from "./page.module.css";
 
 export default function HomePage() {
   const [filters, setFilters] = useState<LaunchFilters>(DEFAULT_FILTERS);
-
-  // Debounce only the search text; other filters apply immediately.
   const debouncedSearch = useDebounce(filters.search, 400);
   const activeFilters = { ...filters, search: debouncedSearch };
 
@@ -24,7 +22,7 @@ export default function HomePage() {
     isFetchingNextPage,
   } = useLaunches(activeFilters);
 
-  const launches = data?.pages.flatMap((page) => page.docs) ?? [];
+  const launches = data?.pages.flatMap((p) => p.docs) ?? [];
 
   function update<K extends keyof LaunchFilters>(
     key: K,
@@ -34,116 +32,119 @@ export default function HomePage() {
   }
 
   return (
-    <main>
-      <h1>SpaceX Explorer</h1>
+    <>
+      <h1>Launches</h1>
 
-      <p>
-        <Link href="/favorites">View favorites →</Link>
-      </p>
-
-      <div>
-        <label htmlFor="search">Search missions</label>
-        <input
-          id="search"
-          type="search"
-          value={filters.search}
-          onChange={(e) => update("search", e.target.value)}
-          placeholder="e.g. Starlink"
-        />
-
-        <label htmlFor="timeframe">Timeframe</label>
-        <select
-          id="timeframe"
-          value={filters.timeframe}
-          onChange={(e) =>
-            update("timeframe", e.target.value as LaunchFilters["timeframe"])
-          }
-        >
-          <option value="all">All</option>
-          <option value="upcoming">Upcoming</option>
-          <option value="past">Past</option>
-        </select>
-
-        <label htmlFor="outcome">Outcome</label>
-        <select
-          id="outcome"
-          value={filters.outcome}
-          onChange={(e) =>
-            update("outcome", e.target.value as LaunchFilters["outcome"])
-          }
-        >
-          <option value="all">All</option>
-          <option value="success">Success</option>
-          <option value="failure">Failure</option>
-        </select>
-
-        <label htmlFor="dateFrom">From</label>
-        <input
-          id="dateFrom"
-          type="date"
-          value={filters.dateFrom}
-          onChange={(e) => update("dateFrom", e.target.value)}
-        />
-
-        <label htmlFor="dateTo">To</label>
-        <input
-          id="dateTo"
-          type="date"
-          value={filters.dateTo}
-          onChange={(e) => update("dateTo", e.target.value)}
-        />
-
-        <label htmlFor="sort">Sort</label>
-        <select
-          id="sort"
-          value={`${filters.sortField}:${filters.sortDirection}`}
-          onChange={(e) => {
-            const [field, dir] = e.target.value.split(":");
-            setFilters((prev) => ({
-              ...prev,
-              sortField: field as LaunchFilters["sortField"],
-              sortDirection: dir as LaunchFilters["sortDirection"],
-            }));
-          }}
-        >
-          <option value="date_utc:desc">Date (newest)</option>
-          <option value="date_utc:asc">Date (oldest)</option>
-          <option value="name:asc">Name (A–Z)</option>
-          <option value="name:desc">Name (Z–A)</option>
-        </select>
-
+      <div className={styles.filters}>
+        <div className={styles.field}>
+          <label htmlFor="search">Search</label>
+          <input
+            id="search"
+            type="search"
+            value={filters.search}
+            onChange={(e) => update("search", e.target.value)}
+            placeholder="e.g. Starlink"
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="timeframe">Timeframe</label>
+          <select
+            id="timeframe"
+            value={filters.timeframe}
+            onChange={(e) =>
+              update("timeframe", e.target.value as LaunchFilters["timeframe"])
+            }
+          >
+            <option value="all">All</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="past">Past</option>
+          </select>
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="outcome">Outcome</label>
+          <select
+            id="outcome"
+            value={filters.outcome}
+            onChange={(e) =>
+              update("outcome", e.target.value as LaunchFilters["outcome"])
+            }
+          >
+            <option value="all">All</option>
+            <option value="success">Success</option>
+            <option value="failure">Failure</option>
+          </select>
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="dateFrom">From</label>
+          <input
+            id="dateFrom"
+            type="date"
+            value={filters.dateFrom}
+            onChange={(e) => update("dateFrom", e.target.value)}
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="dateTo">To</label>
+          <input
+            id="dateTo"
+            type="date"
+            value={filters.dateTo}
+            onChange={(e) => update("dateTo", e.target.value)}
+          />
+        </div>
+        <div className={styles.field}>
+          <label htmlFor="sort">Sort</label>
+          <select
+            id="sort"
+            value={`${filters.sortField}:${filters.sortDirection}`}
+            onChange={(e) => {
+              const [field, dir] = e.target.value.split(":");
+              setFilters((prev) => ({
+                ...prev,
+                sortField: field as LaunchFilters["sortField"],
+                sortDirection: dir as LaunchFilters["sortDirection"],
+              }));
+            }}
+          >
+            <option value="date_utc:desc">Date (newest)</option>
+            <option value="date_utc:asc">Date (oldest)</option>
+            <option value="name:asc">Name (A–Z)</option>
+            <option value="name:desc">Name (Z–A)</option>
+          </select>
+        </div>
         <button onClick={() => setFilters(DEFAULT_FILTERS)}>Reset</button>
       </div>
 
-      {isPending && <p>Loading launches…</p>}
+      {isPending && <p className={styles.state}>Loading launches…</p>}
 
       {isError && (
-        <div role="alert">
+        <div className={styles.state} role="alert">
           <p>Could not load launches.</p>
           <button onClick={() => refetch()}>Retry</button>
         </div>
       )}
 
       {!isPending && !isError && launches.length === 0 && (
-        <p>No launches match your filters.</p>
+        <p className={styles.state}>No launches match your filters.</p>
       )}
 
       {launches.length > 0 && (
-        <ul>
+        <ul className={styles.grid}>
           {launches.map((launch) => (
-            <li key={launch.id}>
-              <Link href={`/launches/${launch.id}`}>{launch.name}</Link>
-              <FavoriteButton launch={{ id: launch.id, name: launch.name }} />
-            </li>
+            <LaunchCard key={launch.id} launch={launch} />
           ))}
         </ul>
       )}
 
       {hasNextPage && (
-        <button onClick={() => fetchNextPage()} disabled={isFetchingNextPage}>
+        <button
+          className={styles.loadMore}
+          onClick={() => fetchNextPage()}
+          disabled={isFetchingNextPage}
+        >
           {isFetchingNextPage ? "Loading…" : "Load more"}
         </button>
       )}
-    </main>
+    </>
   );
 }

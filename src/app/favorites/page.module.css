@@ -1,0 +1,33 @@
+.back {
+  display: inline-block;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  background: #fff;
+  border: 1px solid #e2e5ea;
+  border-radius: 8px;
+}
+
+.empty {
+  color: #97a1b0;
+  margin-top: 1rem;
+}
+
+.button:hover {
+  background-color: #e2e5ea;
+}

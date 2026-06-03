@@ -1,0 +1,30 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 1rem;
+  background: #fff;
+  border: 1px solid #e2e5ea;
+  border-radius: 8px;
+}
+
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.status {
+  font-size: 0.75rem;
+  color: #5b6472;
+}
+
+.name {
+  font-weight: 600;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: #5b6472;
+}

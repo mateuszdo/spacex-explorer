@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useFavorites } from "@/lib/hooks/useFavorites";
+import { useFavorites } from "@/lib/favorites-context";
 import styles from "./page.module.css";
 
 export default function FavoritesPage() {

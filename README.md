@@ -2,6 +2,10 @@
 
 A frontend explorer for SpaceX launch data, built with Next.js, React, and TypeScript.
 
+**Live demo:** https://spacex-explorer-tawny.vercel.app
+
+**Github link:** https://github.com/mateuszdo/spacex-explorer
+
 ## Status
 
 Completed

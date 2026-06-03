@@ -1,6 +1,6 @@
 "use client";
 
-import { useFavorites, type Favorite } from "@/lib/hooks/useFavorites";
+import { useFavorites, type Favorite } from "@/lib/favorites-context";
 
 export function FavoriteButton({ launch }: { launch: Favorite }) {
   const { isFavorite, toggle, hydrated } = useFavorites();
